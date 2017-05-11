@@ -150,8 +150,11 @@ def strip_binaries():
 
 
 def strip_binary(binary_path):
-    if get_target_arch() == 'arm':
+    arch = get_target_arch()
+    if arch == 'arm':
       strip = 'arm-linux-gnueabihf-strip'
+    elif arch == 'arm64':
+      strip = 'aarch64-linux-gnu-strip'
     else:
       strip = 'strip'
     execute([strip, binary_path])

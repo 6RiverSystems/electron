@@ -33,17 +33,21 @@ URL_PATH = 'atom/debian-sysroot-image-creator/releases/download'
 REVISION_AMD64 = 'v0.5.0'
 REVISION_I386 = 'v0.5.0'
 REVISION_ARM = 'v0.5.0'
+REVISION_ARM64 = 'v0.5.0'
 TARBALL_AMD64 = 'debian_wheezy_amd64_sysroot.tgz'
 TARBALL_I386 = 'debian_wheezy_i386_sysroot.tgz'
 TARBALL_ARM = 'debian_wheezy_arm_sysroot.tgz'
+TARBALL_ARM64 = 'debian_jessie_arm64_sysroot.tgz'
 TARBALL_AMD64_SHA1SUM = '981b2440d446156801c6fdecffb5edcadf27593c'
 TARBALL_I386_SHA1SUM = '2e4e43c1e8718595e37c6b6ab89256dae53adf23'
 TARBALL_ARM_SHA1SUM = '448e635f38e99d6d860db538a9db85ac74d36e41'
+TARBALL_ARM64_SHA1SUM = 'bd9b894d9db7f834b707ba4c9c2bbfbe0d162c6f'
 SYSROOT_DIR_AMD64 = 'debian_wheezy_amd64-sysroot'
 SYSROOT_DIR_I386 = 'debian_wheezy_i386-sysroot'
 SYSROOT_DIR_ARM = 'debian_wheezy_arm-sysroot'
+SYSROOT_DIR_ARM64 = 'debian_jessie_arm64-sysroot'
 
-valid_archs = ('arm', 'i386', 'amd64')
+valid_archs = ('arm', 'i386', 'amd64', 'arm64')
 
 
 def GetSha1(filename):
@@ -125,6 +129,11 @@ def main():
     tarball_filename = TARBALL_ARM
     tarball_sha1sum = TARBALL_ARM_SHA1SUM
     revision = REVISION_ARM
+  elif target_arch == 'arm64':
+    sysroot = os.path.join(linux_dir, SYSROOT_DIR_ARM64)
+    tarball_filename = TARBALL_ARM64
+    tarball_sha1sum = TARBALL_ARM64_SHA1SUM
+    revision = REVISION_ARM64
   elif target_arch == 'i386':
     sysroot = os.path.join(linux_dir, SYSROOT_DIR_I386)
     tarball_filename = TARBALL_I386
@@ -139,12 +148,13 @@ def main():
   stamp = os.path.join(sysroot, '.stamp')
   if os.path.exists(stamp):
     with open(stamp) as s:
-      if s.read() == url:
+      stamp_url = s.read()
+      if stamp_url == url:
         print 'Debian Wheezy %s root image already up-to-date: %s' % \
             (target_arch, sysroot)
         return 0
 
-  print 'Installing Debian Wheezy %s root image: %s' % (target_arch, sysroot)
+  print 'Installing Debian Wheezy (or Jessie for arm64) %s root image: %s' % (target_arch, sysroot)
   if os.path.isdir(sysroot):
     shutil.rmtree(sysroot)
   os.mkdir(sysroot)
