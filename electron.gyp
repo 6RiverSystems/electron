@@ -4,7 +4,7 @@
     'product_name%': 'Electron',
     'company_name%': 'GitHub, Inc',
     'company_abbr%': 'github',
-    'version%': '1.6.7',
+    'version%': '1.7.0',
     'js2c_input_dir': '<(SHARED_INTERMEDIATE_DIR)/js2c',
   },
   'includes': [
@@ -81,7 +81,7 @@
               # is marked for no PIE (ASLR).
               'postbuild_name': 'Make More Helpers',
               'action': [
-                'vendor/brightray/tools/mac/make_more_helpers.sh',
+                'tools/mac/make_more_helpers.sh',
                 'Frameworks',
                 '<(product_name)',
               ],
@@ -220,7 +220,7 @@
       'dependencies': [
         'atom_js2c',
         'vendor/pdf_viewer/pdf_viewer.gyp:pdf_viewer',
-        'vendor/brightray/brightray.gyp:brightray',
+        'brightray/brightray.gyp:brightray',
         'vendor/node/node.gyp:node',
       ],
       'defines': [
@@ -237,9 +237,6 @@
         'USING_V8_SHARED',
         'USING_V8_PLATFORM_SHARED',
         'USING_V8_BASE_SHARED',
-        # Remove this after enable_plugins becomes a feature flag.
-        'ENABLE_PLUGINS',
-        'USE_PROPRIETARY_CODECS',
       ],
       'sources': [
         '<@(lib_sources)',
@@ -247,7 +244,7 @@
       'include_dirs': [
         '.',
         'chromium_src',
-        'vendor/brightray',
+        'brightray',
         'vendor/native_mate',
         # Include atom_natives.h.
         '<(SHARED_INTERMEDIATE_DIR)',
@@ -274,7 +271,7 @@
         ],
       },
       'export_dependent_settings': [
-        'vendor/brightray/brightray.gyp:brightray',
+        'brightray/brightray.gyp:brightray',
       ],
       'conditions': [
         ['libchromiumcontent_component', {

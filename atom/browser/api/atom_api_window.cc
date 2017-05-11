@@ -173,7 +173,7 @@ void Window::WillDestroyNativeObject() {
 }
 
 void Window::OnWindowClosed() {
-  api_web_contents_->DestroyWebContents();
+  api_web_contents_->DestroyWebContents(true /* async */);
 
   RemoveFromWeakMap();
   window_->RemoveObserver(this);
@@ -189,6 +189,10 @@ void Window::OnWindowClosed() {
   // Destroy the native class when window is closed.
   base::ThreadTaskRunnerHandle::Get()->PostTask(
       FROM_HERE, GetDestroyClosure());
+}
+
+void Window::OnWindowEndSession() {
+  Emit("session-end");
 }
 
 void Window::OnWindowBlur() {

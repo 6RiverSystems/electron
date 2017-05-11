@@ -307,6 +307,7 @@ It creates a new `BrowserWindow` with native properties as set by the `options`.
       'Electron Isolated Context' entry in the combo box at the top of the
       Console tab. **Note:** This option is currently experimental and may
       change or be removed in future Electron releases.
+    * `nativeWindowOpen` Boolean (optional) - Whether to use native `window.open()`. Defaults to `false`.
 
 When setting minimum or maximum window size with `minWidth`/`maxWidth`/
 `minHeight`/`maxHeight`, it only constrains the users. It won't prevent you from
@@ -375,6 +376,11 @@ window.onbeforeunload = (e) => {
 
 Emitted when the window is closed. After you have received this event you should
 remove the reference to the window and avoid using it any more.
+
+#### Event: 'session-end' _Windows_
+
+Emitted when window session is going to end due to force shutdown or machine restart 
+or session log off.
 
 #### Event: 'unresponsive'
 

@@ -667,6 +667,8 @@ app.setJumpList([
   * `argv` String[] - An array of the second instance's command line arguments
   * `workingDirectory` String - The second instance's working directory
 
+Returns `Boolean`.
+
 This method makes your application a Single Instance Application - instead of
 allowing multiple instances of your app to run, this will ensure that only a
 single instance of your app is running, and other instances signal this
@@ -759,6 +761,10 @@ indicates success while any other value indicates failure according to chromium 
 Disables hardware acceleration for current app.
 
 This method can only be called before app is ready.
+
+### `app.getAppMemoryInfo()`
+
+Returns [ProcessMemoryInfo[]](structures/process-memory-info.md):  Array of `ProcessMemoryInfo` objects that correspond to memory usage statistics of all the processes associated with the app.
 
 ### `app.setBadgeCount(count)` _Linux_ _macOS_
 
