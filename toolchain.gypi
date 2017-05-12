@@ -10,7 +10,14 @@
       'mac_sdk_min%': '10.10',
 
       # Set ARM architecture version.
-      'arm_version%': 7,
+      'conditions': [
+        ['target_arch=="arm"', {
+          'arm_version%': 7,
+        }],
+        ['target_arch=="arm64"', {
+          'arm_version%': 8,
+        }],
+      ],
 
       # Set NEON compilation flags.
       'arm_neon%': 1,
@@ -52,6 +59,9 @@
               # incorrect results when passed to pkg-config
               'sysroot%': '<(source_root)/vendor/debian_wheezy_arm-sysroot',
             }],
+            ['target_arch=="arm64"', {
+              'sysroot%': '<(source_root)/vendor/debian_jessie_arm64-sysroot',
+            }],
             ['target_arch=="ia32"', {
               'sysroot%': '<(source_root)/vendor/debian_wheezy_i386-sysroot',
             }],
@@ -89,6 +99,23 @@
         'arm_float_abi%': 'hard',
         'arm_thumb%': 1,
       }],  # arm_version==7
+      ['arm_version==8', {
+        # This setting optimizes compilation for Nvidia TX2 arch
+        # Use --defines option flag of ./script/boostrap.py to override for other boards. 
+        # Example: 
+        # ./script/bootstrap.py -v --target_arch=arm64 --build_libchromiumcontent --defines "arm_arch=armv8-a arm_tune=cortex-a53"
+        'arm_arch%': 'armv8-a+crc',
+        'arm_tune%': 'cortex-a57',
+        # Getting this warnings if the 3 variables bellow are declared
+        # It seems that they make no effect for arm64 version 
+        # clang: warning: argument unused during compilation: '-mfpu=vfpv4' [-Wunused-command-line-argument]
+        # clang: warning: argument unused during compilation: '-mfloat-abi=hard' [-Wunused-command-line-argument]
+        # clang: warning: argument unused during compilation: '-mthumb' [-Wunused-command-line-argument]
+        # clearing them out
+        'arm_fpu%': '',
+        'arm_float_abi%': '',
+        'arm_thumb%': 0,
+      }],  # arm_version==8
     ],
   },
   'conditions': [
@@ -137,7 +164,7 @@
     }],
 
     # Setup sysroot environment.
-    ['OS=="linux" and target_arch in ["arm", "ia32", "x64"]', {
+    ['OS=="linux" and target_arch in ["arm", "arm64", "ia32", "x64"]', {
       'target_defaults': {
         'target_conditions': [
           ['_toolset=="target"', {
@@ -257,6 +284,83 @@
               }],
             ],
           }],  # target_arch=="arm" and _toolset=="target"
+          ['target_arch=="arm64" and _toolset=="target"', {
+            'conditions': [
+              ['clang==0', {
+                'cflags_cc': [
+                  '-Wno-abi',
+                ],
+              }],
+              ['clang==1 and arm_arch!=""', {
+                'cflags': [
+                  '-target aarch64-linux-gnu',
+                ],
+                'ldflags': [
+                  '-target aarch64-linux-gnu',
+                ],
+              }],
+              ['arm_arch!=""', {
+                'cflags': [
+                  '-march=<(arm_arch)',
+                ],
+                'conditions': [
+                  ['use_lto==1 or use_lto_o2==1', {
+                    'ldflags': [
+                      '-march=<(arm_arch)',
+                    ],
+                  }],
+                ],
+              }],
+              ['arm_tune!=""', {
+                'cflags': [
+                  '-mtune=<(arm_tune)',
+                ],
+                'conditions': [
+                  ['use_lto==1 or use_lto_o2==1', {
+                    'ldflags': [
+                      '-mtune=<(arm_tune)',
+                    ],
+                  }],
+                ],
+              }],
+              ['arm_fpu!=""', {
+                'cflags': [
+                  '-mfpu=<(arm_fpu)',
+                ],
+                'conditions': [
+                  ['use_lto==1 or use_lto_o2==1', {
+                    'ldflags': [
+                      '-mfpu=<(arm_fpu)',
+                    ],
+                  }],
+                ],
+              }],
+              ['arm_float_abi!=""', {
+                'cflags': [
+                  '-mfloat-abi=<(arm_float_abi)',
+                ],
+                'conditions': [
+                  ['use_lto==1 or use_lto_o2==1', {
+                    'ldflags': [
+                      '-mfloat-abi=<(arm_float_abi)',
+                    ],
+                  }],
+                ],
+              }],
+              ['arm_thumb==1', {
+                'cflags': [
+                  '-mthumb',
+                ],
+                'conditions': [
+                  ['use_lto==1 or use_lto_o2==1', {
+                    'ldflags': [
+                      '-mthumb',
+                    ],
+                  }],
+                ],
+              }],
+            ],
+          }],  # target_arch=="arm64" and _toolset=="target"
         ],
       },
     }],  # OS=="linux"
